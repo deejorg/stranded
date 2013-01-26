@@ -1,14 +1,23 @@
 package
 {
+	import game.LevelDevelop;
+	
 	import starling.display.Sprite;
-	import starling.text.TextField;
 	
 	public class Stranded extends Sprite
-	{	
+	{
+		private var _scenesContainer:Sprite;
+		private var _director:Director;
+		
 		public function Stranded()
 		{
-			var textField:TextField = new TextField(200,30,"Hello World","Verdana",12,0xFFFFFF);
-			addChild(textField);
+			_scenesContainer = new Sprite();
+			addChild(_scenesContainer);
+			
+			_director = Director.instance;
+			
+			_director.scenesContainer = this;
+			_director.changeToScene( new LevelDevelop() );
 		}
 	}
 }
