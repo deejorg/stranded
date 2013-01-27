@@ -44,7 +44,7 @@ package game.sound
 		}
 		
 		//bpm
-		private var _bpm:uint = 96;
+		private var _bpm:uint = 160;//96;
 		
 		public function get BPM():uint
 		{

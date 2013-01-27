@@ -46,12 +46,12 @@ public class b2ContactListener
 	/**
 	 * Called when two fixtures begin to touch.
 	 */
-	public virtual function BeginContact(contact:b2Contact):void { }
+	public function BeginContact(contact:b2Contact):void { }
 
 	/**
 	 * Called when two fixtures cease to touch.
 	 */
-	public virtual function EndContact(contact:b2Contact):void { }
+	public function EndContact(contact:b2Contact):void { }
 
 	/**
 	 * This is called after a contact is updated. This allows you to inspect a
@@ -65,7 +65,7 @@ public class b2ContactListener
 	 * get an EndContact callback. However, you may get a BeginContact callback
 	 * the next step.
 	 */
-	public virtual function PreSolve(contact:b2Contact, oldManifold:b2Manifold):void {}
+	public function PreSolve(contact:b2Contact, oldManifold:b2Manifold):void {}
 
 	/**
 	 * This lets you inspect a contact after the solver is finished. This is useful
@@ -75,7 +75,7 @@ public class b2ContactListener
 	 * in a separate data structure.
 	 * Note: this is only called for contacts that are touching, solid, and awake.
 	 */
-	public virtual function PostSolve(contact:b2Contact, impulse:b2ContactImpulse):void { }
+	public function PostSolve(contact:b2Contact, impulse:b2ContactImpulse):void { }
 	
 	b2internal static var b2_defaultListener:b2ContactListener = new b2ContactListener();
 };

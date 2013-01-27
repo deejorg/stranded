@@ -15,34 +15,34 @@ package game
 			heartBeat.push( new BeatSound( 1, .5 ) );
 			heartBeat.push( new BeatSound( 1, 0 ) );
 			
-			heartBeat.push( new BeatSound( 1, 1 ) );
+			heartBeat.push( new BeatSound( 2, 1 ) );
 			heartBeat.push( new BeatSound( 1, 0 ) );
-			heartBeat.push( new BeatSound( 1, .5 ) );
-			heartBeat.push( new BeatSound( 1, 0 ) );
+			heartBeat.push( new BeatSound( 1, .1 ) );
+			heartBeat.push( new BeatSound( 1, .1 ) );
 			
 			heartBeat.push( new BeatSound( 1, 1 ) );
 			heartBeat.push( new BeatSound( 1, 0 ) );
 			heartBeat.push( new BeatSound( 1, .5 ) );
 			heartBeat.push( new BeatSound( 1, 0 ) );
 			
-			heartBeat.push( new BeatSound( 1, 1 ) );
+			heartBeat.push( new BeatSound( 2, 1 ) );
 			heartBeat.push( new BeatSound( 1, 0 ) );
-			heartBeat.push( new BeatSound( 1, .5 ) );
-			heartBeat.push( new BeatSound( 1, 0 ) );
+			heartBeat.push( new BeatSound( 1, .2 ) );
+			heartBeat.push( new BeatSound( 1, .2 ) );
 			
 			super( heartBeat, 400 );
 		}
 		
 		protected override function setupCoreBall():void
 		{
-			_coreBall = new CoreBall( new Point(400,300), 100, 200, _world );
+			_coreBall = new CoreBall( new Point(400,300), 50, 100, _world );
 			
 			addChild(_coreBall);
 		}
 		
 		protected override function setupHero():void
 		{
-			_hero = new Hero( new Point(400, 100), _world );
+			_hero = new Hero( new Point(400, 50), _world );
 			
 			addChild(_hero);
 		}

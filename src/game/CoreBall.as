@@ -23,7 +23,7 @@ package game
 		public function CoreBall( position:Point, standRadius:Number, pulseRadius:Number, world:b2World )
 		{
 			_position = position;
-			_standRadius = standRadius;
+			_standRadius = _actualRadius =standRadius;
 			_pulseRadius = pulseRadius;
 			_world = world;
 			
@@ -135,6 +135,16 @@ package game
 				
 				TweenLite.to(this, Heart.instance.beatTime/1000*beatSound.duration, { _actualRadius:_standRadius, ease:Sine.easeOut } );
 			}
+		}
+		
+		public function get standRadius():Number
+		{
+			return _standRadius;
+		}
+		
+		public function get pulseRadius():Number
+		{
+			return _pulseRadius;
 		}
 		
 		//update

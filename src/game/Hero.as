@@ -127,6 +127,8 @@ package game
 		}
 		
 		//control
+		public var moving:Boolean;
+		
 		public function left( center:Point ):void
 		{
 			var distance:b2Vec2 = _body.GetPosition().Copy();
@@ -164,6 +166,39 @@ package game
 				velocity.Multiply(13/velocityLength);
 				_body.SetLinearVelocity( velocity );
 			}
+		}
+		
+		public function impulseLeft( center:Point ):void
+		{
+			var distance:b2Vec2 = _body.GetPosition().Copy();
+			distance.Subtract(new b2Vec2( center.x, center.y ) );
+			
+			var perpendicular:b2Vec2 = new b2Vec2( -distance.y, distance.x );
+			perpendicular.Multiply(.5);
+			perpendicular.NegativeSelf();
+			
+			_body.ApplyImpulse( perpendicular, _body.GetWorldCenter() );
+		}
+		
+		public function impulseRight( center:Point ):void
+		{
+			var distance:b2Vec2 = _body.GetPosition().Copy();
+			distance.Subtract(new b2Vec2( center.x, center.y ) );
+			
+			var perpendicular:b2Vec2 = new b2Vec2( -distance.y, distance.x );
+			perpendicular.Multiply(.5);
+			
+			_body.ApplyImpulse( perpendicular, _body.GetWorldCenter() );
+		}
+		
+		public function impulseJump( velocity:b2Vec2 ):void
+		{
+			_body.ApplyImpulse( velocity, _body.GetWorldCenter() );
+		}
+		
+		public function brake():void
+		{
+			_body.SetLinearVelocity( new b2Vec2( _body.GetLinearVelocity().x*.8, _body.GetLinearVelocity().y*.7 ) );
 		}
 	}
 }
