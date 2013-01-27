@@ -11,12 +11,16 @@ package game
 	import Box2D.Dynamics.b2World;
 	
 	import flash.geom.Point;
+	import flash.media.Sound;
+	import flash.media.SoundChannel;
+	import flash.media.SoundTransform;
 	import flash.ui.Keyboard;
 	
 	import game.sound.BeatSound;
 	import game.sound.Heart;
 	import game.sound.HeartEvent;
 	
+	import starling.display.Shape;
 	import starling.display.Sprite;
 	import starling.events.Event;
 	import starling.events.KeyboardEvent;
@@ -45,6 +49,7 @@ package game
 			setupCoreBall();
 			setupHero();
 			setupControls();
+			setupTheme();
 			
 			start();
 			
@@ -111,6 +116,13 @@ package game
 					sprite.y = bb.GetPosition().y * WORLD_SCALE;
 					sprite.rotation = bb.GetAngle();// * (180/Math.PI);
 				}
+				
+				if (bb.GetUserData() is Shape){
+					var shape:Shape = bb.GetUserData() as Shape;
+					shape.x = bb.GetPosition().x * WORLD_SCALE;
+					shape.y = bb.GetPosition().y * WORLD_SCALE;
+					shape.rotation = bb.GetAngle();// * (180/Math.PI);
+				}
 			}
 		}
 		
@@ -126,9 +138,6 @@ package game
 		protected function updateLevel():void
 		{
 			
-			//updateLevelBody(_levelCrust, _coreBall.body.GetPosition(), _levelCrustAngle+1 );
-			
-			//_levelCrustAngle += 1/60;
 		}
 		
 		protected function destroyLevel():void
@@ -145,57 +154,60 @@ package game
 			body.SetAngle( angle );
 			body.SetAngularVelocity(1);
 			
-			for (var i:int = 0; i < bodyObject.rigidBodies[0].polygons.length; i++) 
-			{	
-				var vertices:Vector.<b2Vec2> = new Vector.<b2Vec2>();
-				var vertice:b2Vec2;
-				
-				for (var j:int = 0; j < bodyObject.rigidBodies[0].polygons[i].length; j++) 
+			var shape:Shape = new Shape();
+			
+			shape.x = centerPosition.x;
+			shape.y = centerPosition.y;
+			
+			body.SetUserData( shape );
+			
+			addChild(shape);
+			
+			for(var h:int = 0; h < bodyObject.rigidBodies.length; h++ )
+			{
+				for (var i:int = 0; i < bodyObject.rigidBodies[h].polygons.length; i++) 
 				{	
-					vertice = new b2Vec2( (bodyObject.rigidBodies[0].polygons[i][j].x*800)/WORLD_SCALE, (bodyObject.rigidBodies[0].polygons[i][j].y*800)/WORLD_SCALE*1 );
+					var vertices:Vector.<b2Vec2> = new Vector.<b2Vec2>();
+					var vertice:b2Vec2;
 					
-					var newAngle:Number = Math.atan2(vertice.y, vertice.x) + angle;
+					if( h == 1 ){
+						shape.graphics.beginFill(0x032142);
+					} else {
+						shape.graphics.beginFill(0x032e5d);
+					}
 					
-					vertice.Set( Math.cos(newAngle)*vertice.Length(), Math.sin(newAngle)*vertice.Length() );
+					for (var j:int = 0; j < bodyObject.rigidBodies[h].polygons[i].length; j++) 
+					{
+						vertice = new b2Vec2( (bodyObject.rigidBodies[h].polygons[i][j].x*800)/WORLD_SCALE, (bodyObject.rigidBodies[h].polygons[i][j].y*800)/WORLD_SCALE*1 );
+						
+						var newAngle:Number = Math.atan2(vertice.y, vertice.x) + angle;
+						
+						vertice.Set( Math.cos(newAngle)*vertice.Length(), Math.sin(newAngle)*vertice.Length() );
+						
+						if( j == 0 ){
+							shape.graphics.moveTo(vertice.x*WORLD_SCALE, vertice.y*WORLD_SCALE);
+						} else {
+							shape.graphics.lineTo(vertice.x*WORLD_SCALE, vertice.y*WORLD_SCALE);
+						}
+						
+						vertices.push( vertice );
+					}
 					
-					vertices.push( vertice );
+					shape.graphics.endFill();
+					
+					var polyShape:b2PolygonShape = new b2PolygonShape();
+					polyShape.SetAsVector(vertices,vertices.length);
+					var fixtureDef:b2FixtureDef = new b2FixtureDef();
+					fixtureDef.shape = polyShape;
+					fixtureDef.density = 1;
+					fixtureDef.restitution = 0.1;
+					fixtureDef.friction = 5;
+					body.CreateFixture(fixtureDef);
+					
 				}
-				
-				
-				var polyShape:b2PolygonShape = new b2PolygonShape();
-				polyShape.SetAsVector(vertices,vertices.length);
-				var fixtureDef:b2FixtureDef = new b2FixtureDef();
-				fixtureDef.shape = polyShape;
-				fixtureDef.density = 1;
-				fixtureDef.restitution = 0.1;
-				fixtureDef.friction = 5;
-				body.CreateFixture(fixtureDef);
-				
 			}
 			
 			return body;
-		}
-		
-		protected function updateLevelBody( body:b2Body, centerPosition:b2Vec2, angle:Number ):void
-		{			
-			for (var fixture:b2Fixture = body.GetFixtureList(); fixture; fixture = fixture.GetNext()){
-				
-				var shape:b2PolygonShape = fixture.GetShape() as b2PolygonShape;
-				var vertices:Vector.<b2Vec2> = shape.GetVertices();
-				var vertice:b2Vec2;
-				
-				for (var i:int = 0; i < vertices.length; i++) 
-				{
-					vertice = vertices[i];
-					
-					var newAngle:Number = Math.atan2(vertice.y, vertice.x) + deg2rad(angle-_levelCrustAngle);
-					
-					vertice.Set( Math.cos(newAngle)*vertice.Length(), Math.sin(newAngle)*vertice.Length() );
-				}
-				
-				shape.SetAsVector(vertices);
-			}
-			
 		}
 		
 		//debug draw
@@ -216,7 +228,7 @@ package game
 		
 		private function updateDebugDraw():void
 		{
-			_world.DrawDebugData();
+			//_world.DrawDebugData();
 		}
 		
 		//heart beat
@@ -376,6 +388,19 @@ package game
 		{
 			stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 			stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyUp);
+		}
+		
+		//sound
+		[Embed(source="assets/theme.mp3")]
+		public var Theme:Class;
+		
+		protected var theme:Sound;
+		
+		protected function setupTheme():void
+		{
+			theme = new Theme();
+			
+			var channel:SoundChannel = theme.play();
 		}
 	}
 }

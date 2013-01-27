@@ -40,7 +40,7 @@ package game
 			super( heartBeat, 400 );
 		}
 		
-		[Embed(source="assets/test1.txt",mimeType="application/octet-stream")]
+		[Embed(source="assets/level1Fixtures.txt",mimeType="application/octet-stream")]
 		public var SquareTest:Class;
 		protected var _squareTest:Object;
 		
@@ -55,14 +55,13 @@ package game
 		protected override function setupCoreBall():void
 		{
 			_coreBall = new CoreBall( new Point(400,300), 50, 100, _world );
-			//_coreBall = new CoreBall( new Point(0,0), 50, 100, _world );
 			
 			addChild(_coreBall);
 		}
 		
 		protected override function setupHero():void
 		{
-			_hero = new Hero( new Point(400, 50), _world );
+			_hero = new Hero( new Point(400, 150), _world );
 			
 			addChild(_hero);
 		}
