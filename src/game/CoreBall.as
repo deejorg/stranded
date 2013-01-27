@@ -14,9 +14,12 @@ package game
 	import game.sound.BeatSound;
 	import game.sound.Heart;
 	
+	import starling.display.Image;
 	import starling.display.Shape;
 	import starling.display.Sprite;
 	import starling.events.Event;
+	import starling.filters.BlurFilter;
+	import starling.textures.Texture;
 	
 	public class CoreBall extends Sprite
 	{	
@@ -92,32 +95,40 @@ package game
 		//sprite
 		private var _sprite:Sprite;
 		private var _shape:Shape;
+		private var _image:Image;
+		
+		[Embed(source="assets/core.png")]
+		public var CoreBitmap:Class;
 		
 		private function setupSprite():void
 		{
 			_sprite = new Sprite();
 			addChild(_sprite);
 			
-			_shape = new Shape();
-			_shape.graphics.beginFill( 0xFF0000 );
-			_shape.graphics.drawCircle(0,0,_standRadius);
-			_shape.graphics.endFill();
+			_image = new Image( Texture.fromBitmap( new CoreBitmap() ) );
+			_image.width = _standRadius*2;
+			_image.height = _standRadius*2;
+			_image.x = - _image.width/2;
+			_image.y = - _image.height/2;
+			_sprite.addChild( _image );
 			
-			_sprite.addChild(_shape);
+			//_image.filter = BlurFilter.createGlow(0xffffff, 1, 10);
+			
+			//addChild(_shape);
 		}
 		
 		private function updateSprite():void
 		{
-			_shape.graphics.clear();
-			_shape.graphics.beginFill( 0xFF0000, 1 );
-			_shape.graphics.drawCircle(0,0,_actualRadius);
-			_shape.graphics.endFill();
+			_image.width = _actualRadius*2;
+			_image.height = _actualRadius*2;
+			_image.x = - _image.width/2;
+			_image.y = - _image.height/2;
 		}
 		
 		private function destroySprite():void
 		{
-			_sprite.removeChild(_shape);
-			_shape = null;
+			_sprite.removeChild(_image);
+			_image = null;
 			
 			removeChild(_sprite);
 			_sprite = null;

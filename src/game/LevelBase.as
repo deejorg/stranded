@@ -1,8 +1,13 @@
 package game
 {
+	import Box2D.Collision.Shapes.b2PolygonShape;
+	import Box2D.Collision.Shapes.b2Shape;
 	import Box2D.Common.Math.b2Vec2;
 	import Box2D.Dynamics.b2Body;
+	import Box2D.Dynamics.b2BodyDef;
 	import Box2D.Dynamics.b2DebugDraw;
+	import Box2D.Dynamics.b2Fixture;
+	import Box2D.Dynamics.b2FixtureDef;
 	import Box2D.Dynamics.b2World;
 	
 	import flash.geom.Point;
@@ -15,6 +20,7 @@ package game
 	import starling.display.Sprite;
 	import starling.events.Event;
 	import starling.events.KeyboardEvent;
+	import starling.utils.deg2rad;
 	
 	public class LevelBase extends Sprite
 	{
@@ -33,6 +39,7 @@ package game
 			addEventListener(Event.REMOVED_FROM_STAGE, onRemovedFromStage);
 			
 			setupWorld();
+			setupLevel();
 			setupDebugDraw();
 			setupHeartBeat();
 			setupCoreBall();
@@ -54,6 +61,7 @@ package game
 			destroyCoreBall();
 			destroyHeartBeat();
 			destroyDebugDraw();
+			destroyLevel();
 			destroyWorld();
 			
 			removeEventListener(Event.ENTER_FRAME, onUpdate);
@@ -69,6 +77,7 @@ package game
 		{
 			updateWorld();
 			updateGravity();
+			updateLevel();
 			updateHero();
 			updateDebugDraw();
 		}
@@ -100,9 +109,93 @@ package game
 					var sprite:Sprite = bb.GetUserData() as Sprite;
 					sprite.x = bb.GetPosition().x * WORLD_SCALE;
 					sprite.y = bb.GetPosition().y * WORLD_SCALE;
-					sprite.rotation = bb.GetAngle() * (180/Math.PI);
+					sprite.rotation = bb.GetAngle();// * (180/Math.PI);
 				}
 			}
+		}
+		
+		//level
+		protected var _levelCrust:b2Body;
+		protected var _levelCrustAngle:Number;
+		
+		protected function setupLevel():void
+		{
+			//
+		}
+		
+		protected function updateLevel():void
+		{
+			
+			//updateLevelBody(_levelCrust, _coreBall.body.GetPosition(), _levelCrustAngle+1 );
+			
+			//_levelCrustAngle += 1/60;
+		}
+		
+		protected function destroyLevel():void
+		{
+			
+		}
+		
+		protected function addLevelBody( bodyObject:Object, centerPosition:Point, angle:Number ):b2Body
+		{
+			var bodyDef:b2BodyDef = new b2BodyDef();
+			bodyDef.position.Set(centerPosition.x/WORLD_SCALE, centerPosition.y/WORLD_SCALE);
+			bodyDef.type = b2Body.b2_kinematicBody;
+			var body:b2Body = _world.CreateBody(bodyDef);
+			body.SetAngle( angle );
+			body.SetAngularVelocity(1);
+			
+			for (var i:int = 0; i < bodyObject.rigidBodies[0].polygons.length; i++) 
+			{	
+				var vertices:Vector.<b2Vec2> = new Vector.<b2Vec2>();
+				var vertice:b2Vec2;
+				
+				for (var j:int = 0; j < bodyObject.rigidBodies[0].polygons[i].length; j++) 
+				{	
+					vertice = new b2Vec2( (bodyObject.rigidBodies[0].polygons[i][j].x*800)/WORLD_SCALE, (bodyObject.rigidBodies[0].polygons[i][j].y*800)/WORLD_SCALE*1 );
+					
+					var newAngle:Number = Math.atan2(vertice.y, vertice.x) + angle;
+					
+					vertice.Set( Math.cos(newAngle)*vertice.Length(), Math.sin(newAngle)*vertice.Length() );
+					
+					vertices.push( vertice );
+				}
+				
+				
+				var polyShape:b2PolygonShape = new b2PolygonShape();
+				polyShape.SetAsVector(vertices,vertices.length);
+				var fixtureDef:b2FixtureDef = new b2FixtureDef();
+				fixtureDef.shape = polyShape;
+				fixtureDef.density = 1;
+				fixtureDef.restitution = 0.1;
+				fixtureDef.friction = 5;
+				body.CreateFixture(fixtureDef);
+				
+			}
+			
+			return body;
+		}
+		
+		protected function updateLevelBody( body:b2Body, centerPosition:b2Vec2, angle:Number ):void
+		{			
+			for (var fixture:b2Fixture = body.GetFixtureList(); fixture; fixture = fixture.GetNext()){
+				
+				var shape:b2PolygonShape = fixture.GetShape() as b2PolygonShape;
+				var vertices:Vector.<b2Vec2> = shape.GetVertices();
+				var vertice:b2Vec2;
+				
+				for (var i:int = 0; i < vertices.length; i++) 
+				{
+					vertice = vertices[i];
+					
+					var newAngle:Number = Math.atan2(vertice.y, vertice.x) + deg2rad(angle-_levelCrustAngle);
+					
+					vertice.Set( Math.cos(newAngle)*vertice.Length(), Math.sin(newAngle)*vertice.Length() );
+				}
+				
+				shape.SetAsVector(vertices);
+			}
+			
 		}
 		
 		//debug draw
@@ -158,7 +251,8 @@ package game
 				
 					var heroImpulseVector:b2Vec2 = heroDistanceVector.Copy();
 					heroImpulseVector.Normalize();
-					heroImpulseVector.Multiply( 9 + Math.abs(coreBallPulseDistanceLength - heroDistanceLength)*7 );
+					//heroImpulseVector.Multiply( 9 + Math.abs(coreBallPulseDistanceLength - heroDistanceLength)*7 );
+					heroImpulseVector.Multiply( 15 + Math.abs(coreBallPulseDistanceLength - heroDistanceLength)*10 );
 					
 					_hero.impulseJump( heroImpulseVector );
 				}

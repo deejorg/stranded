@@ -10,13 +10,16 @@ package game
 	
 	import flash.geom.Point;
 	
+	import starling.display.Image;
+	import starling.display.MovieClip;
 	import starling.display.Shape;
 	import starling.display.Sprite;
 	import starling.events.Event;
+	import starling.textures.Texture;
 	
 	public class Hero extends Sprite
 	{
-		public const HERO_RADIUS:Number = 10;
+		public const HERO_RADIUS:Number = 13;
 		
 		public function Hero( position:Point, world:b2World )
 		{
@@ -72,6 +75,7 @@ package game
 			bodyDef.position.Set(_position.x/LevelBase.WORLD_SCALE, _position.y/LevelBase.WORLD_SCALE);
 			bodyDef.type = b2Body.b2_dynamicBody;
 			bodyDef.userData = this;
+			bodyDef.bullet = true;
 			var bodyShape:b2CircleShape = new b2CircleShape(HERO_RADIUS/LevelBase.WORLD_SCALE);
 			var fixtureDef:b2FixtureDef = new b2FixtureDef();
 			fixtureDef.shape = bodyShape;
@@ -96,31 +100,47 @@ package game
 		private var _sprite:Sprite;
 		private var _shape:Shape;
 		
+		[Embed(source="assets/char.png")]
+		public var CharactedBitmap:Class;
+		
 		private function setupSprite():void
 		{
 			_sprite = new Sprite();
 			addChild(_sprite);
 			
+			var image:Image = new Image( Texture.fromBitmap( new CharactedBitmap() ) );
+			image.width = HERO_RADIUS*2;
+			image.height = HERO_RADIUS*2;
+			image.x = - image.width/2;
+			image.y = - image.height/2;
+			_sprite.addChild( image );
+			
+			/*
 			_shape = new Shape();
 			_shape.graphics.beginFill( 0x0000ff );
 			_shape.graphics.drawCircle(0,0,HERO_RADIUS);
 			_shape.graphics.endFill();
 			
 			_sprite.addChild(_shape);
+			*/
 		}
 		
 		private function updateSprite():void
 		{
+			/*
 			_shape.graphics.clear();
 			_shape.graphics.beginFill( 0xFF0000, 1 );
 			_shape.graphics.drawCircle(0,0,HERO_RADIUS);
 			_shape.graphics.endFill();
+			*/
 		}
 		
 		private function destroySprite():void
 		{
+			/*
 			_sprite.removeChild(_shape);
 			_shape = null;
+			*/
 			
 			removeChild(_sprite);
 			_sprite = null;

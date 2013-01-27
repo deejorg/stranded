@@ -1,6 +1,13 @@
 package game
 {
+	import Box2D.Collision.Shapes.b2PolygonShape;
+	import Box2D.Common.Math.b2Vec2;
+	import Box2D.Dynamics.b2Body;
+	import Box2D.Dynamics.b2BodyDef;
+	import Box2D.Dynamics.b2FixtureDef;
+	
 	import flash.geom.Point;
+	import flash.utils.ByteArray;
 	
 	import game.sound.BeatSound;
 
@@ -33,9 +40,22 @@ package game
 			super( heartBeat, 400 );
 		}
 		
+		[Embed(source="assets/test1.txt",mimeType="application/octet-stream")]
+		public var SquareTest:Class;
+		protected var _squareTest:Object;
+		
+		protected override function setupLevel():void
+		{
+			_squareTest = JSON.parse( new SquareTest().toString() );
+			
+			_levelCrustAngle = 0;
+			_levelCrust = addLevelBody( _squareTest, new Point(400,300), _levelCrustAngle ); 
+		}
+		
 		protected override function setupCoreBall():void
 		{
 			_coreBall = new CoreBall( new Point(400,300), 50, 100, _world );
+			//_coreBall = new CoreBall( new Point(0,0), 50, 100, _world );
 			
 			addChild(_coreBall);
 		}
